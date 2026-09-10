@@ -1,4 +1,3 @@
-```markdown
 # Calima
 
 <div align="center">
@@ -66,7 +65,7 @@ calima/
    python -m http.server 8000
    ```
 
-3. Abre `http://localhost:8000` en el navegador. Listo ✅
+3. Abre `http://localhost:8000` en el navegador. Listo
 
 ---
 
@@ -175,4 +174,3 @@ Los archivos se sirven mediante **signed URLs** temporales (1 hora) generadas al
 Proyecto personal creado por **Juan Quichimbo**.
 
 Hecho con ❤︎ — tu nube, tus reglas.
-```
