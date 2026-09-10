@@ -7,8 +7,10 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
     auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true,  // ← esto procesa el hash automáticamente
-        flowType: 'implicit'
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+        storageKey: 'calima-auth',
+        flowType: 'pkce'
     }
 });
 
@@ -81,7 +83,10 @@ function escapeHtml(str) {
 loginBtn.addEventListener('click', async () => {
     const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin + window.location.pathname }
+        options: {
+            redirectTo: window.location.origin + window.location.pathname,
+            skipBrowserRedirect: false
+        }
     });
     if (error) showSnackbar('Login error: ' + error.message, 'error');
 });
@@ -305,22 +310,45 @@ hiddenFileInput.addEventListener('change', async (e) => {
 refreshBtn.addEventListener('click', loadFiles);
 
 // ============================================================
-// Init — esperar a que Supabase procese el hash de la URL
+// Init — manejar el callback de OAuth
 // ============================================================
 async function init() {
-    // 1. Forzar al SDK a procesar el hash (si viene de OAuth)
-    const { data: { session: s } } = await supabaseClient.auth.getSession();
-    session = s;
+    // Detectar si venimos del callback de OAuth
+    const url = new URL(window.location.href);
+    const hasCodeInHash = window.location.hash.includes('access_token');
+    const hasCodeInQuery = url.searchParams.has('code');
 
-    // 2. Limpiar el hash de la URL si existe
-    if (window.location.hash && window.location.hash.includes('access_token')) {
-        window.history.replaceState(
-            null,
-            document.title,
-            window.location.pathname + window.location.search
-        );
+    if (hasCodeInHash || hasCodeInQuery) {
+        console.log('🔐 Procesando callback de OAuth...');
+
+        // Esperar a que el SDK procese el código
+        await new Promise((resolve) => {
+            const timeout = setTimeout(() => {
+                console.warn('⏱️ Timeout esperando SIGNED_IN');
+                resolve();
+            }, 3000);
+
+            const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((event, s) => {
+                console.log('📢 Auth event:', event, s ? '(con sesión)' : '(sin sesión)');
+                if (event === 'SIGNED_IN' && s) {
+                    session = s;
+                    clearTimeout(timeout);
+                    subscription.unsubscribe();
+                    resolve();
+                }
+            });
+        });
+
+        // Limpiar la URL
+        window.history.replaceState(null, document.title, window.location.pathname);
+    } else {
+        // Flujo normal
+        const { data: { session: s }, error } = await supabaseClient.auth.getSession();
+        if (error) console.error('Error getSession:', error);
+        session = s;
     }
 
+    console.log('👤 Sesión final:', session);
     updateUI();
 }
 
@@ -330,6 +358,7 @@ supabaseClient.auth.onAuthStateChange((_event, s) => {
     session = s;
     updateUI();
 });
+
 function updateUI() {
     if (session) {
         loginView.classList.add('hidden');
