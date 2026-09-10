@@ -171,6 +171,5 @@ Los archivos se sirven mediante **signed URLs** temporales (1 hora) generadas al
 
 ## Licencia
 
-Proyecto personal creado por **Juan Quichimbo**.
-
-Hecho con ❤︎ — tu nube, tus reglas.
+Proyecto personal
+Hecho con ❤︎ por **Juan Quichimbo**.
