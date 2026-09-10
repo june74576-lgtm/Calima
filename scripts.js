@@ -1,7 +1,8 @@
 // 🔑 CONFIGURACIÓN — ¡USA LAS CREDENCIALES DE TU PROYECTO!
+// 🔑 CONFIGURACIÓN - ¡USA LAS CREDENCIALES DE TU PROYECTO EXISTENTE!
 const SUPABASE_URL = 'https://mupdiqlibvhvckcoqprp.supabase.co';
-const SUPABASE_ANON_KEY = 'tu-anon-key-aqui'; // ← Pega aquí tu ANON KEY (NO la service_role)
-const STORAGE_BUCKET = 'calima';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11cGRpcWxpYnZodmNrY29xcHJwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDc0NDg0OSwiZXhwIjoyMTAwMzIwODQ5fQ.ldSNOhv5PDAvvA88M0yGSQzHS_XaVbGfzpEQUx22Ye0';
+const STORAGE_BUCKET = 'calima'; // ← Bucket nuevo
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
