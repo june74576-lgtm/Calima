@@ -3,7 +3,14 @@ const SUPABASE_URL = 'https://mupdiqlibvhvckcoqprp.supabase.co';
 const SUPABASE_ANON_KEY = 'tu-anon-key-aqui'; // ← Pega aquí tu ANON KEY (NO la service_role)
 const STORAGE_BUCKET = 'calima';
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,  // ← esto procesa el hash automáticamente
+        flowType: 'implicit'
+    }
+});
 
 // ============================================================
 // State
@@ -298,19 +305,31 @@ hiddenFileInput.addEventListener('change', async (e) => {
 refreshBtn.addEventListener('click', loadFiles);
 
 // ============================================================
-// Init
+// Init — esperar a que Supabase procese el hash de la URL
 // ============================================================
-(async () => {
+async function init() {
+    // 1. Forzar al SDK a procesar el hash (si viene de OAuth)
     const { data: { session: s } } = await supabaseClient.auth.getSession();
     session = s;
+
+    // 2. Limpiar el hash de la URL si existe
+    if (window.location.hash && window.location.hash.includes('access_token')) {
+        window.history.replaceState(
+            null,
+            document.title,
+            window.location.pathname + window.location.search
+        );
+    }
+
     updateUI();
-})();
+}
+
+init();
 
 supabaseClient.auth.onAuthStateChange((_event, s) => {
     session = s;
     updateUI();
 });
-
 function updateUI() {
     if (session) {
         loginView.classList.add('hidden');
