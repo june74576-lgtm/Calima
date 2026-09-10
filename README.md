@@ -2,7 +2,7 @@
 
 <div align="center">
   <img src="logo.png" alt="Calima" width="140" />
-  <p><em>Tu nube personal</em></p>
+  <p><em>Archivos que flotan</em></p>
 </div>
 
 **Calima** es una aplicación web de almacenamiento en la nube personal. Sube, organiza y comparte tus archivos desde cualquier dispositivo, con un diseño oscuro minimalista inspirado en Material You.
