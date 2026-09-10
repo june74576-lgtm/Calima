@@ -122,9 +122,13 @@ body::-webkit-scrollbar { display: none; }
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.login-logo {
-    font-size: 60px;
-    margin-bottom: 8px;
+/* Logo de imagen en el login */
+.login-logo-img {
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+    margin: 0 auto 12px;
+    display: block;
     filter: drop-shadow(0 8px 24px rgba(198, 184, 255, 0.3));
     animation: logoFloat 3s ease-in-out infinite;
 }
@@ -923,4 +927,12 @@ body::-webkit-scrollbar { display: none; }
     .dialog-card { padding: 24px 20px; }
 
     .login-card { padding: 40px 28px 36px; }
+}
+
+.breadcrumb-logo {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-right: 4px;
 }

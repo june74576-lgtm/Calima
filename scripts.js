@@ -219,7 +219,7 @@ function renderBreadcrumb() {
     breadcrumb.classList.remove('hidden');
 
     const parts = currentPath.split('/');
-    let html = `<span data-path="">📁 Calima</span>`;
+    let html = `<span data-path=""><img src="logo.png" alt="" class="breadcrumb-logo" /> Calima</span>`;
 
     parts.forEach((part, i) => {
         const path = parts.slice(0, i + 1).join('/');
