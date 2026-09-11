@@ -74,21 +74,29 @@
     <div id="dashboardView" class="view hidden">
         <!-- TOPBAR -->
         <header class="topbar">
-            <div class="user-menu-wrapper">
-                <button id="userMenuBtn" class="user-menu-btn">
-                    <img id="userAvatar" class="user-avatar" src="" alt="User" />
-                    <span id="userName" class="user-name">User</span>
-                    <span class="material-icons user-chevron">expand_more</span>
+            <!-- HAMBURGER + USER -->
+            <div class="topbar-left">
+                <button id="mobileMenuBtn" class="hamburger-btn" aria-label="Menu">
+                    <span class="material-icons">menu</span>
                 </button>
-                <div id="userDropdown" class="user-dropdown hidden">
-                    <button id="logoutBtn" class="dropdown-item">
-                        <span class="material-icons">logout</span>
-                        Sign out
+
+                <div class="user-menu-wrapper">
+                    <button id="userMenuBtn" class="user-menu-btn">
+                        <img id="userAvatar" class="user-avatar" src="" alt="User" />
+                        <span id="userName" class="user-name">User</span>
+                        <span class="material-icons user-chevron">expand_more</span>
                     </button>
+                    <div id="userDropdown" class="user-dropdown hidden">
+                        <button id="logoutBtn" class="dropdown-item">
+                            <span class="material-icons">logout</span>
+                            Sign out
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="topbar-actions">
+            <!-- ACTIONS (solo desktop) -->
+            <div class="topbar-actions desktop-only">
                 <button id="newFolderBtn" class="action-btn">
                     <span class="material-icons">create_new_folder</span>
                     <span class="action-label">Folder</span>
@@ -145,7 +153,21 @@
             <p>They'll be uploaded to the current folder</p>
         </div>
     </div>
+    <!-- MOBILE FABs -->
+    <div class="mobile-fabs mobile-only">
+        <button id="mobileRefreshBtn" class="fab-small" aria-label="Refresh">
+            <span class="material-icons">refresh</span>
+        </button>
+        <button id="mobileFolderBtn" class="fab-small" aria-label="New folder">
+            <span class="material-icons">create_new_folder</span>
+        </button>
+        <button id="mobileUploadBtn" class="fab-upload" aria-label="Upload">
+            <span class="material-icons">add</span>
+        </button>
+    </div>
 
+    <!-- BACKDROP para el drawer móvil -->
+    <div id="treeBackdrop" class="tree-backdrop hidden"></div>
     <!-- SNACKBAR -->
     <div id="snackbar" class="snackbar"></div>
 

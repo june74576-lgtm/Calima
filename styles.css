@@ -346,13 +346,42 @@ body::-webkit-scrollbar { display: none; }
     position: sticky;
     top: 16px;
     z-index: 50;
-    /* Blur + fondo más sólido para que se vea bien al hacer scroll */
     backdrop-filter: blur(24px) saturate(1.6);
     -webkit-backdrop-filter: blur(24px) saturate(1.6);
     background: rgba(10, 10, 14, 0.72);
     box-shadow: var(--shadow-md);
     transition: background var(--t-base) var(--ease-out);
 }
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+}
+
+/* Hamburguesa (solo móvil) */
+.hamburger-btn {
+    display: none;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--t-fast) var(--ease-out);
+}
+
+.hamburger-btn:hover {
+    background: var(--surface-2);
+}
+
+.hamburger-btn .material-icons { font-size: 22px; }
 
 /* User Menu */
 .user-menu-wrapper { position: relative; }
@@ -535,8 +564,8 @@ body::-webkit-scrollbar { display: none; }
 
 .file-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
 }
 
 .file-card {
@@ -1271,4 +1300,172 @@ body::-webkit-scrollbar { display: none; }
 @media (max-width: 900px) {
     .file-tree { display: none; }
     .dashboard-layout { gap: 0; }
+}
+
+/* Archivos dentro del árbol */
+.tree-file-icon {
+    font-size: 16px !important;
+    color: var(--ac-2);
+    flex-shrink: 0;
+    opacity: 0.75;
+}
+
+.tree-row.is-file .tree-label {
+    color: var(--text-muted);
+    font-size: 12.5px;
+}
+
+.tree-row.is-file .tree-label:hover {
+    color: var(--text-primary);
+}
+
+.tree-row.is-file.active {
+    background: var(--surface-2);
+    color: var(--text-primary);
+}
+
+/* ============================================================
+   MOBILE FABs · abajo a la derecha
+   ============================================================ */
+.mobile-fabs {
+    position: fixed;
+    right: 20px;
+    bottom: 24px;
+    z-index: 900;
+    display: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.fab-upload {
+    width: 62px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ac-2);
+    color: var(--ac-text);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(198, 184, 255, 0.4),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform var(--t-fast) var(--ease-out),
+                background var(--t-base) var(--ease-out);
+}
+
+.fab-upload:hover  { background: var(--ac-1); }
+.fab-upload:active { transform: scale(0.92); }
+
+.fab-upload .material-icons { font-size: 30px; }
+
+.fab-small {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-3);
+    color: var(--text-secondary);
+    border: 1px solid var(--ln-1);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    transition: transform var(--t-fast) var(--ease-out),
+                background var(--t-base) var(--ease-out),
+                color var(--t-base) var(--ease-out);
+}
+
+.fab-small:hover  { background: var(--surface-2); color: var(--text-primary); }
+.fab-small:active { transform: scale(0.92); }
+
+.fab-small .material-icons { font-size: 20px; }
+
+/* ============================================================
+   TREE BACKDROP (móvil)
+   ============================================================ */
+.tree-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 950;
+    animation: id-fade-in 0.2s var(--ease-out);
+}
+
+/* ============================================================
+   MOBILE · ajustes globales
+   ============================================================ */
+@media (max-width: 900px) {
+    /* Mostrar FABs */
+    .mobile-fabs { display: flex; }
+
+    /* Mostrar hamburguesa */
+    .hamburger-btn { display: flex; }
+
+    /* Ocultar acciones del topbar */
+    .topbar-actions { display: none !important; }
+
+    /* El layout pierde el gap porque el sidebar es overlay */
+    .dashboard-layout { gap: 0; }
+
+    /* Sidebar como drawer flotante */
+    .file-tree {
+        position: fixed;
+        top: 90px;
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        width: auto;
+        max-width: 420px;
+        margin: 0 auto;
+        max-height: none;
+        z-index: 1000;
+        display: none;
+        background: var(--surface-2);
+        border: 1px solid var(--ln-2);
+        border-radius: var(--radius-xl);
+        padding: 16px;
+        overflow-y: auto;
+        box-shadow: var(--sh-lg);
+    }
+
+    .file-tree.mobile-open {
+        display: block;
+        animation: id-scale-in 0.3s var(--ease-out);
+    }
+
+    /* Topbar un poco más compacta */
+    .topbar {
+        padding: 8px 12px 8px 8px;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    /* Mostrar el nombre en móvil (ya hay espacio) */
+    .user-name {
+        display: inline;
+        max-width: 140px;
+    }
+
+    /* El avatar sigue siendo clickeable */
+    .user-menu-btn {
+        padding: 4px 10px 4px 4px;
+        gap: 8px;
+    }
+}
+
+/* Ajuste para móviles pequeños */
+@media (max-width: 420px) {
+    .user-name {
+        max-width: 100px;
+        font-size: 13px;
+    }
+
+    .fab-upload {
+        width: 58px;
+        height: 58px;
+    }
 }

@@ -271,6 +271,18 @@ async function openFile(name) {
     window.open(data.signedUrl, '_blank');
 }
 
+async function openFileFromPath(fullPath) {
+    const { data, error } = await supabaseClient.storage
+        .from(STORAGE_BUCKET)
+        .createSignedUrl(fullPath, 3600);
+
+    if (error) {
+        showSnackbar('Error: ' + error.message, 'error');
+        return;
+    }
+    window.open(data.signedUrl, '_blank');
+}
+
 // ============================================================
 // Borrar carpeta recursivamente
 // ============================================================
@@ -325,42 +337,38 @@ async function deleteFolderRecursive(folderPath) {
     }
 }
 
-    // ============================================================
-    // Breadcrumb
-    // ============================================================
-    function renderBreadcrumb() {
-        if (!currentPath) {
-            breadcrumb.classList.add('hidden');
-            return;
-        }
-        breadcrumb.classList.remove('hidden');
-
-        const parts = currentPath.split('/');
-        let html = `<span data-path=""><img src="logo.svg" alt="" class="breadcrumb-logo" /> Calima</span>`;
-        parts.forEach((part, i) => {
-            const path = parts.slice(0, i + 1).join('/');
-            html += `<span class="sep">/</span>`;
-            html += `<span data-path="${path}">${escapeHtml(part)}</span>`;
-        });
-
-        breadcrumb.innerHTML = html;
-        breadcrumb.querySelectorAll('span[data-path]').forEach(el => {
-            el.addEventListener('click', () => {
-                currentPath = el.dataset.path;
-                loadFiles();
-            });
-        });
-        breadcrumb.querySelectorAll('span[data-path]').forEach(el => {
-            el.addEventListener('click', () => {
-                currentPath = el.dataset.path;
-                loadFiles();
-                // Sincronizar con el árbol
-                document.querySelectorAll('.tree-row').forEach(row => {
-                    row.classList.toggle('active', row.dataset.path === currentPath);
-                });
-            });
-        });
+// ============================================================
+// Breadcrumb
+// ============================================================
+function renderBreadcrumb() {
+    if (!currentPath) {
+        breadcrumb.classList.add('hidden');
+        return;
     }
+    breadcrumb.classList.remove('hidden');
+
+    const parts = currentPath.split('/');
+    let html = `<span data-path=""><img src="logo.svg" alt="" class="breadcrumb-logo" /> Calima</span>`;
+
+    parts.forEach((part, i) => {
+        const path = parts.slice(0, i + 1).join('/');
+        html += `<span class="sep">/</span>`;
+        html += `<span data-path="${path}">${escapeHtml(part)}</span>`;
+    });
+
+    breadcrumb.innerHTML = html;
+
+    breadcrumb.querySelectorAll('span[data-path]').forEach(el => {
+        el.addEventListener('click', () => {
+            currentPath = el.dataset.path;
+            loadFiles();
+            // Sincronizar con el árbol lateral
+            document.querySelectorAll('.tree-row').forEach(row => {
+                row.classList.toggle('active', row.dataset.path === currentPath);
+            });
+        });
+    });
+}
 
 
 // ============================================================
@@ -660,18 +668,20 @@ async function loadTreeFolder(path, ulElement, depth = 0) {
         return;
     }
 
-    const folders = (data || []).filter(f => {
-        const isFolder = !f.metadata || f.metadata.size === 0 || f.id === null;
-        return isFolder && f.name !== '.keep';
-    });
+    const items = (data || []).filter(f => f.name !== '.keep');
 
     ulElement.innerHTML = '';
 
-    if (folders.length === 0) {
-        ulElement.innerHTML = `<li class="tree-empty">No folders</li>`;
+    if (items.length === 0) {
+        ulElement.innerHTML = `<li class="tree-empty">Empty</li>`;
         return;
     }
 
+    // Separar carpetas y archivos, carpetas primero
+    const folders = items.filter(f => !f.metadata || f.metadata.size === 0 || f.id === null);
+    const filesArr = items.filter(f => f.metadata && f.metadata.size > 0 && f.id !== null);
+
+    // Renderizar carpetas
     folders.forEach(folder => {
         const fullPath = path ? `${path}/${folder.name}` : folder.name;
         const li = document.createElement('li');
@@ -691,16 +701,41 @@ async function loadTreeFolder(path, ulElement, depth = 0) {
             <ul class="tree-children hidden"></ul>
         `;
 
-        // Expandir / colapsar
         li.querySelector('.tree-toggle').addEventListener('click', async (e) => {
             e.stopPropagation();
             await toggleTreeNode(li);
         });
 
-        // Navegar al hacer click en el nombre
         li.querySelector('.tree-label').addEventListener('click', (e) => {
             e.stopPropagation();
             navigateToPath(fullPath);
+            closeMobileTree();
+        });
+
+        ulElement.appendChild(li);
+    });
+
+    // Renderizar archivos (sin toggle, no expandibles)
+    filesArr.forEach(file => {
+        const fullPath = path ? `${path}/${file.name}` : file.name;
+        const info = getFileInfo(file.name);
+
+        const li = document.createElement('li');
+        li.className = 'tree-node';
+        li.innerHTML = `
+            <div class="tree-row is-file" data-path="${fullPath}">
+                <button class="tree-toggle hidden-toggle" tabindex="-1">
+                    <span class="material-icons">chevron_right</span>
+                </button>
+                <button class="tree-label">
+                    <span class="material-icons tree-file-icon">${info.icon}</span>
+                    <span class="tree-name">${escapeHtml(file.name)}</span>
+                </button>
+            </div>
+        `;
+
+        li.querySelector('.tree-label').addEventListener('click', () => {
+            openFileFromPath(fullPath);
         });
 
         ulElement.appendChild(li);
@@ -748,3 +783,41 @@ async function refreshTree() {
         row.classList.toggle('active', row.dataset.path === currentPath);
     });
 }
+
+// ============================================================
+// MOBILE UI · Hamburger + FABs
+// ============================================================
+const mobileMenuBtn   = document.getElementById('mobileMenuBtn');
+const mobileRefreshBtn = document.getElementById('mobileRefreshBtn');
+const mobileFolderBtn = document.getElementById('mobileFolderBtn');
+const mobileUploadBtn = document.getElementById('mobileUploadBtn');
+const treeBackdrop    = document.getElementById('treeBackdrop');
+const fileTree        = document.getElementById('fileTree');
+
+function openMobileTree() {
+    fileTree.classList.add('mobile-open');
+    treeBackdrop.classList.remove('hidden');
+}
+
+function closeMobileTree() {
+    fileTree.classList.remove('mobile-open');
+    treeBackdrop.classList.add('hidden');
+}
+
+mobileMenuBtn.addEventListener('click', openMobileTree);
+treeBackdrop.addEventListener('click', closeMobileTree);
+
+// FABs → reutilizan los botones de desktop
+mobileUploadBtn.addEventListener('click', () => {
+    hiddenFileInput.value = '';
+    hiddenFileInput.click();
+});
+
+mobileFolderBtn.addEventListener('click', () => {
+    newFolderBtn.click(); // dispara el mismo flujo
+});
+
+mobileRefreshBtn.addEventListener('click', () => {
+    loadFiles();
+    refreshTree();
+});
