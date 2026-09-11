@@ -94,7 +94,7 @@ body::-webkit-scrollbar { display: none; }
 .hidden { display: none !important; }
 
 /* ============================================================
-   LOGIN VIEW · Plano sobre negro puro
+   LOGIN VIEW · Wordmark + Bottom Sheet
    ============================================================ */
 #loginView {
     min-height: 100vh;
@@ -104,11 +104,12 @@ body::-webkit-scrollbar { display: none; }
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 40px 24px 48px;
-    gap: 40px;
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
 }
 
-/* Wordmark "Calima" arriba */
+/* Wordmark "Calima" flotando sobre negro puro */
 .login-wordmark {
     font-family: 'Varela Round', sans-serif;
     font-size: 34px;
@@ -116,11 +117,25 @@ body::-webkit-scrollbar { display: none; }
     letter-spacing: 1.5px;
     color: var(--ac-2);
     text-align: center;
-    margin: 0;
+    margin: 48px 0 28px;
     animation: id-fade-in 0.6s var(--ease-out);
 }
 
-/* Formulario */
+/* Bottom sheet */
+.login-sheet {
+    flex: 1;
+    width: 100%;
+    background: #0F0F0F;
+    border-top-left-radius: var(--r-xl);
+    border-top-right-radius: var(--r-xl);
+    padding: 40px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: id-slide-up 0.55s var(--ease-out);
+}
+
+/* Formulario dentro del sheet */
 .login-form {
     width: 100%;
     max-width: 360px;
@@ -128,10 +143,9 @@ body::-webkit-scrollbar { display: none; }
     flex-direction: column;
     align-items: stretch;
     gap: 18px;
-    animation: id-slide-up 0.55s var(--ease-out);
 }
 
-/* Título Sign In · alineado a la izquierda */
+/* Título Sign In · izquierda */
 .login-title {
     font-family: 'Varela Round', sans-serif;
     font-size: 28px;
@@ -272,7 +286,8 @@ body::-webkit-scrollbar { display: none; }
 
 /* Ajuste en pantallas muy pequeñas */
 @media (max-width: 380px) {
-    .login-wordmark { font-size: 30px; }
+    .login-wordmark { font-size: 30px; margin: 32px 0 20px; }
+    .login-sheet { padding: 32px 20px 32px; }
     .login-title { font-size: 24px; }
     .field-input,
     .btn-signin { height: 48px; }
