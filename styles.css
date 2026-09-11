@@ -94,7 +94,7 @@ body::-webkit-scrollbar { display: none; }
 .hidden { display: none !important; }
 
 /* ============================================================
-   LOGIN VIEW · Mobile-first
+   LOGIN VIEW · Plano sobre negro puro
    ============================================================ */
 #loginView {
     min-height: 100vh;
@@ -104,15 +104,14 @@ body::-webkit-scrollbar { display: none; }
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px 20px;
-    position: relative;
-    gap: 40px;
+    padding: 40px 24px;
+    gap: 56px;
 }
 
 /* Wordmark "Calima" */
 .login-wordmark {
     font-family: 'Varela Round', sans-serif;
-    font-size: 44px;
+    font-size: 42px;
     font-weight: 400;
     letter-spacing: 1.5px;
     color: var(--ac-2);
@@ -121,38 +120,15 @@ body::-webkit-scrollbar { display: none; }
     animation: id-fade-in 0.6s var(--ease-out);
 }
 
-/* Tarjeta flotante */
-.login-card {
+/* Formulario (sin fondo, sin borde) */
+.login-form {
     width: 100%;
-    max-width: 400px;
-    background: var(--bg-3);
-    border: 1px solid var(--ln-1);
-    border-radius: var(--r-xl);
-    padding: 36px 26px 28px;
+    max-width: 360px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 24px;
+    gap: 20px;
     animation: id-slide-up 0.55s var(--ease-out);
-}
-
-/* Logo */
-.login-logo-wrap {
-    display: flex;
-    justify-content: center;
-}
-
-.login-logo-img {
-    width: 64px;
-    height: 64px;
-    object-fit: contain;
-    animation: id-float 3.2s ease-in-out infinite;
-    filter: drop-shadow(0 8px 24px rgba(198, 184, 255, 0.25));
-}
-
-/* Header */
-.login-header {
-    text-align: center;
 }
 
 .login-title {
@@ -161,18 +137,12 @@ body::-webkit-scrollbar { display: none; }
     font-weight: 400;
     letter-spacing: 0.5px;
     color: var(--tx-1);
-    margin: 0 0 6px;
+    text-align: center;
+    margin: 0 0 8px;
 }
 
-.login-subtitle {
-    font-size: 13px;
-    color: var(--tx-3);
-    margin: 0;
-    letter-spacing: 0.2px;
-}
-
-/* Botón Google principal (acento lavanda) */
-.btn-google-primary {
+/* Botón Google · pill · lavanda */
+.btn-google {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -191,20 +161,20 @@ body::-webkit-scrollbar { display: none; }
         background var(--t-base) var(--ease-out),
         transform var(--t-fast) var(--ease-out),
         box-shadow var(--t-base) var(--ease-out);
-    box-shadow: 0 6px 24px rgba(198, 184, 255, 0.25);
+    box-shadow: 0 6px 24px rgba(198, 184, 255, 0.22);
 }
 
-.btn-google-primary:hover {
+.btn-google:hover {
     background: var(--ac-1);
-    box-shadow: 0 8px 30px rgba(198, 184, 255, 0.35);
+    box-shadow: 0 8px 30px rgba(198, 184, 255, 0.32);
 }
 
-.btn-google-primary:active {
+.btn-google:active {
     transform: scale(0.97);
     background: var(--ac-3);
 }
 
-.btn-google-primary svg {
+.btn-google svg {
     flex-shrink: 0;
 }
 
@@ -214,7 +184,7 @@ body::-webkit-scrollbar { display: none; }
     font-size: 11px;
     color: var(--tx-4);
     line-height: 1.6;
-    margin: 0;
+    margin: 8px 0 0;
     letter-spacing: 0.2px;
 }
 
@@ -229,13 +199,12 @@ body::-webkit-scrollbar { display: none; }
     text-decoration: underline;
 }
 
-/* Ajuste fino en pantallas muy pequeñas */
+/* Ajuste en pantallas muy pequeñas */
 @media (max-width: 380px) {
     .login-wordmark { font-size: 36px; }
-    .login-card { padding: 28px 20px 24px; }
     .login-title { font-size: 22px; }
+    .btn-google { padding: 14px 20px; font-size: 14px; }
 }
-
 /* ============================================================
    DASHBOARD - TOPBAR
    ============================================================ */
