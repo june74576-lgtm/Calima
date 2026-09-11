@@ -78,6 +78,54 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
+// Mapa de extensiones → icono + etiqueta
+function getFileInfo(filename) {
+    const ext = (filename.split('.').pop() || '').toLowerCase();
+    const map = {
+        pdf:  { icon: 'picture_as_pdf', label: 'PDF'  },
+        doc:  { icon: 'description',    label: 'DOC'  },
+        docx: { icon: 'description',    label: 'DOCX' },
+        xls:  { icon: 'table_chart',    label: 'XLS'  },
+        xlsx: { icon: 'table_chart',    label: 'XLSX' },
+        csv:  { icon: 'table_view',     label: 'CSV'  },
+        ppt:  { icon: 'slideshow',      label: 'PPT'  },
+        pptx: { icon: 'slideshow',      label: 'PPTX' },
+        txt:  { icon: 'article',        label: 'TXT'  },
+        md:   { icon: 'article',        label: 'MD'   },
+        html: { icon: 'code',           label: 'HTML' },
+        htm:  { icon: 'code',           label: 'HTML' },
+        css:  { icon: 'css',            label: 'CSS'  },
+        js:   { icon: 'javascript',     label: 'JS'   },
+        json: { icon: 'data_object',    label: 'JSON' },
+        xml:  { icon: 'code',           label: 'XML'  },
+        zip:  { icon: 'folder_zip',     label: 'ZIP'  },
+        rar:  { icon: 'folder_zip',     label: 'RAR'  },
+        '7z': { icon: 'folder_zip',     label: '7Z'   },
+        tar:  { icon: 'folder_zip',     label: 'TAR'  },
+        gz:   { icon: 'folder_zip',     label: 'GZ'   },
+        png:  { icon: 'image',          label: 'PNG'  },
+        jpg:  { icon: 'image',          label: 'JPG'  },
+        jpeg: { icon: 'image',          label: 'JPEG' },
+        gif:  { icon: 'image',          label: 'GIF'  },
+        webp: { icon: 'image',          label: 'WEBP' },
+        svg:  { icon: 'image',          label: 'SVG'  },
+        bmp:  { icon: 'image',          label: 'BMP'  },
+        mp3:  { icon: 'audiotrack',     label: 'MP3'  },
+        wav:  { icon: 'audiotrack',     label: 'WAV'  },
+        ogg:  { icon: 'audiotrack',     label: 'OGG'  },
+        flac: { icon: 'audiotrack',     label: 'FLAC' },
+        mp4:  { icon: 'movie',          label: 'MP4'  },
+        mov:  { icon: 'movie',          label: 'MOV'  },
+        avi:  { icon: 'movie',          label: 'AVI'  },
+        mkv:  { icon: 'movie',          label: 'MKV'  },
+        webm: { icon: 'movie',          label: 'WEBM' },
+        gpx:  { icon: 'map',            label: 'GPX'  },
+        exe:  { icon: 'terminal',       label: 'EXE'  },
+        apk:  { icon: 'android',        label: 'APK'  },
+    };
+    return map[ext] || { icon: 'insert_drive_file', label: ext ? ext.toUpperCase() : 'FILE' };
+}
+
 // ============================================================
 // Auth
 // ============================================================
@@ -152,14 +200,22 @@ function renderFiles() {
 
     files.forEach(file => {
         const isFolder = !file.metadata || file.metadata.size === 0 || file.id === null;
+        const info = isFolder
+            ? { icon: 'folder', label: 'FOLDER' }
+            : getFileInfo(file.name);
+
+        const metaText = isFolder
+            ? 'Folder'
+            : `${info.label} • ${formatSize(file.metadata?.size)}`;
+
         const card = document.createElement('div');
         card.className = 'file-card';
         card.innerHTML = `
             <span class="material-icons file-icon ${isFolder ? 'folder' : ''}">
-                ${isFolder ? 'folder' : 'insert_drive_file'}
+                ${info.icon}
             </span>
             <div class="file-name">${escapeHtml(file.name)}</div>
-            <div class="file-meta">${isFolder ? 'Folder' : formatSize(file.metadata?.size)}</div>
+            <div class="file-meta">${metaText}</div>
             <button class="delete-btn" title="Delete">
                 <span class="material-icons">delete</span>
             </button>
@@ -193,6 +249,7 @@ function renderFiles() {
                 else {
                     showSnackbar('Deleted');
                     loadFiles();
+                    refreshTree();  // ← AÑADIR (por si borraste el último archivo de una carpeta)
                 }
             }
         });
@@ -261,38 +318,50 @@ async function deleteFolderRecursive(folderPath) {
 
         showSnackbar(`Folder deleted (${allPaths.length} file${allPaths.length > 1 ? 's' : ''})`);
         loadFiles();
+        refreshTree();  // ← AÑADIR
     } catch (err) {
         console.error('Error deleting folder:', err);
         showSnackbar('Error: ' + (err.message || 'Unknown'), 'error');
     }
 }
 
-// ============================================================
-// Breadcrumb
-// ============================================================
-function renderBreadcrumb() {
-    if (!currentPath) {
-        breadcrumb.classList.add('hidden');
-        return;
-    }
-    breadcrumb.classList.remove('hidden');
+    // ============================================================
+    // Breadcrumb
+    // ============================================================
+    function renderBreadcrumb() {
+        if (!currentPath) {
+            breadcrumb.classList.add('hidden');
+            return;
+        }
+        breadcrumb.classList.remove('hidden');
 
-    const parts = currentPath.split('/');
-    let html = `<span data-path=""><img src="logo.svg" alt="" class="breadcrumb-logo" /> Calima</span>`;
-    parts.forEach((part, i) => {
-        const path = parts.slice(0, i + 1).join('/');
-        html += `<span class="sep">/</span>`;
-        html += `<span data-path="${path}">${escapeHtml(part)}</span>`;
-    });
-
-    breadcrumb.innerHTML = html;
-    breadcrumb.querySelectorAll('span[data-path]').forEach(el => {
-        el.addEventListener('click', () => {
-            currentPath = el.dataset.path;
-            loadFiles();
+        const parts = currentPath.split('/');
+        let html = `<span data-path=""><img src="logo.svg" alt="" class="breadcrumb-logo" /> Calima</span>`;
+        parts.forEach((part, i) => {
+            const path = parts.slice(0, i + 1).join('/');
+            html += `<span class="sep">/</span>`;
+            html += `<span data-path="${path}">${escapeHtml(part)}</span>`;
         });
-    });
-}
+
+        breadcrumb.innerHTML = html;
+        breadcrumb.querySelectorAll('span[data-path]').forEach(el => {
+            el.addEventListener('click', () => {
+                currentPath = el.dataset.path;
+                loadFiles();
+            });
+        });
+        breadcrumb.querySelectorAll('span[data-path]').forEach(el => {
+            el.addEventListener('click', () => {
+                currentPath = el.dataset.path;
+                loadFiles();
+                // Sincronizar con el árbol
+                document.querySelectorAll('.tree-row').forEach(row => {
+                    row.classList.toggle('active', row.dataset.path === currentPath);
+                });
+            });
+        });
+    }
+
 
 // ============================================================
 // Dialogs
@@ -347,6 +416,7 @@ newFolderBtn.addEventListener('click', () => {
             showSnackbar('Folder created');
             closeDialog();
             loadFiles();
+            refreshTree();  // ← AÑADIR
         }
     });
 });
@@ -366,7 +436,10 @@ hiddenFileInput.addEventListener('change', async (e) => {
 });
 
 // Refresh
-refreshBtn.addEventListener('click', loadFiles);
+refreshBtn.addEventListener('click', () => {
+    loadFiles();
+    refreshTree();
+});
 
 // ============================================================
 // Init — manejar el callback de OAuth
@@ -443,8 +516,9 @@ function updateUI() {
         }
 
         loadFiles();
+        refreshTree();  // ← AÑADIR
     } else {
-        loginView.classList.remove('hidden');
+        loginView.classList.add('hidden');
         dashboardView.classList.add('hidden');
     }
 }
@@ -565,5 +639,112 @@ async function uploadMultipleFiles(filesToUpload) {
         } else {
             showSnackbar(`Uploaded ${total - failed}, failed ${failed}`, 'error');
         }
+    });
+}
+
+// ============================================================
+// FILE TREE · Carga el árbol de carpetas
+// ============================================================
+const treeRoot = document.getElementById('treeRoot');
+
+async function loadTreeFolder(path, ulElement, depth = 0) {
+    const { data, error } = await supabaseClient.storage
+        .from(STORAGE_BUCKET)
+        .list(path, {
+            limit: 1000,
+            sortBy: { column: 'name', order: 'asc' }
+        });
+
+    if (error) {
+        ulElement.innerHTML = `<li class="tree-empty">Error loading</li>`;
+        return;
+    }
+
+    const folders = (data || []).filter(f => {
+        const isFolder = !f.metadata || f.metadata.size === 0 || f.id === null;
+        return isFolder && f.name !== '.keep';
+    });
+
+    ulElement.innerHTML = '';
+
+    if (folders.length === 0) {
+        ulElement.innerHTML = `<li class="tree-empty">No folders</li>`;
+        return;
+    }
+
+    folders.forEach(folder => {
+        const fullPath = path ? `${path}/${folder.name}` : folder.name;
+        const li = document.createElement('li');
+        li.className = 'tree-node';
+        li.dataset.path = fullPath;
+
+        li.innerHTML = `
+            <div class="tree-row" data-path="${fullPath}">
+                <button class="tree-toggle" aria-label="Expand">
+                    <span class="material-icons">chevron_right</span>
+                </button>
+                <button class="tree-label">
+                    <span class="material-icons tree-folder-icon">folder</span>
+                    <span class="tree-name">${escapeHtml(folder.name)}</span>
+                </button>
+            </div>
+            <ul class="tree-children hidden"></ul>
+        `;
+
+        // Expandir / colapsar
+        li.querySelector('.tree-toggle').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            await toggleTreeNode(li);
+        });
+
+        // Navegar al hacer click en el nombre
+        li.querySelector('.tree-label').addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigateToPath(fullPath);
+        });
+
+        ulElement.appendChild(li);
+    });
+}
+
+async function toggleTreeNode(li) {
+    const children = li.querySelector('.tree-children');
+    const toggle = li.querySelector('.tree-toggle');
+    const isExpanded = !children.classList.contains('hidden');
+
+    if (isExpanded) {
+        children.classList.add('hidden');
+        toggle.classList.remove('expanded');
+        return;
+    }
+
+    // Cargar hijos solo la primera vez
+    if (!li.dataset.loaded) {
+        const path = li.dataset.path;
+        children.innerHTML = `<li class="tree-loading">Loading...</li>`;
+        await loadTreeFolder(path, children);
+        li.dataset.loaded = '1';
+    }
+
+    children.classList.remove('hidden');
+    toggle.classList.add('expanded');
+}
+
+function navigateToPath(path) {
+    currentPath = path;
+    // Marcar como activo
+    document.querySelectorAll('.tree-row').forEach(row => {
+        row.classList.toggle('active', row.dataset.path === path);
+    });
+    loadFiles();
+}
+
+// Refrescar el árbol completo
+async function refreshTree() {
+    treeRoot.innerHTML = '';
+    await loadTreeFolder('', treeRoot);
+    // Restaurar el estado activo
+    document.querySelectorAll('.tree-row').forEach(row => {
+        row.classList.toggle('active', row.dataset.path === currentPath);
     });
 }
