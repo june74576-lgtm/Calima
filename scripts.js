@@ -180,14 +180,20 @@ function renderFiles() {
         card.querySelector('.delete-btn').addEventListener('click', async (e) => {
             e.stopPropagation();
             if (!confirm(`Delete "${file.name}"?`)) return;
+        
             const path = currentPath ? currentPath + '/' + file.name : file.name;
-            const { error } = await supabaseClient.storage
-                .from(STORAGE_BUCKET)
-                .remove([path]);
-            if (error) showSnackbar('Error: ' + error.message, 'error');
-            else {
-                showSnackbar('Deleted');
-                loadFiles();
+        
+            if (isFolder) {
+                await deleteFolderRecursive(path);
+            } else {
+                const { error } = await supabaseClient.storage
+                    .from(STORAGE_BUCKET)
+                    .remove([path]);
+                if (error) showSnackbar('Error: ' + error.message, 'error');
+                else {
+                    showSnackbar('Deleted');
+                    loadFiles();
+                }
             }
         });
 
@@ -206,6 +212,59 @@ async function openFile(name) {
         return;
     }
     window.open(data.signedUrl, '_blank');
+}
+
+// ============================================================
+// Borrar carpeta recursivamente
+// ============================================================
+async function deleteFolderRecursive(folderPath) {
+    showSnackbar('Deleting folder...');
+
+    // 1. Recopilar todos los archivos dentro de la carpeta (recursivo)
+    const allPaths = [];
+
+    async function collectFiles(path) {
+        const { data, error } = await supabaseClient.storage
+            .from(STORAGE_BUCKET)
+            .list(path, { limit: 1000 });
+
+        if (error) throw error;
+
+        for (const item of data || []) {
+            const fullPath = path ? `${path}/${item.name}` : item.name;
+            const isFolder = !item.metadata || item.metadata.size === 0 || item.id === null;
+
+            if (isFolder) {
+                // Es subcarpeta: recursión
+                await collectFiles(fullPath);
+            } else {
+                // Es archivo: lo añadimos a la lista
+                allPaths.push(fullPath);
+            }
+        }
+    }
+
+    try {
+        await collectFiles(folderPath);
+
+        // 2. Si no hay archivos dentro (carpeta vacía), intentamos borrar el .keep
+        if (allPaths.length === 0) {
+            allPaths.push(`${folderPath}/.keep`);
+        }
+
+        // 3. Borrar todos los archivos en un solo batch (Supabase acepta arrays)
+        const { error } = await supabaseClient.storage
+            .from(STORAGE_BUCKET)
+            .remove(allPaths);
+
+        if (error) throw error;
+
+        showSnackbar(`Folder deleted (${allPaths.length} file${allPaths.length > 1 ? 's' : ''})`);
+        loadFiles();
+    } catch (err) {
+        console.error('Error deleting folder:', err);
+        showSnackbar('Error: ' + (err.message || 'Unknown'), 'error');
+    }
 }
 
 // ============================================================
