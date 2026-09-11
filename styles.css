@@ -103,15 +103,15 @@ body::-webkit-scrollbar { display: none; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 40px 24px;
-    gap: 56px;
+    justify-content: flex-start;
+    padding: 40px 24px 48px;
+    gap: 40px;
 }
 
-/* Wordmark "Calima" */
+/* Wordmark "Calima" arriba */
 .login-wordmark {
     font-family: 'Varela Round', sans-serif;
-    font-size: 42px;
+    font-size: 34px;
     font-weight: 400;
     letter-spacing: 1.5px;
     color: var(--ac-2);
@@ -120,35 +120,78 @@ body::-webkit-scrollbar { display: none; }
     animation: id-fade-in 0.6s var(--ease-out);
 }
 
-/* Formulario (sin fondo, sin borde) */
+/* Formulario */
 .login-form {
     width: 100%;
     max-width: 360px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 20px;
+    gap: 18px;
     animation: id-slide-up 0.55s var(--ease-out);
 }
 
+/* Título Sign In · alineado a la izquierda */
 .login-title {
     font-family: 'Varela Round', sans-serif;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 400;
     letter-spacing: 0.5px;
     color: var(--tx-1);
-    text-align: center;
-    margin: 0 0 8px;
+    text-align: left;
+    margin: 0 0 12px;
 }
 
-/* Botón Google · pill · lavanda */
-.btn-google {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
+/* Campos */
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field-label {
+    font-family: 'Varela Round', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--tx-4);
+    text-align: left;
+    padding-left: 4px;
+}
+
+.field-input {
     width: 100%;
-    padding: 16px 24px;
+    height: 52px;
+    padding: 0 20px;
+    background: var(--bg-3);
+    color: var(--tx-2);
+    border: 1px solid var(--ln-1);
+    border-radius: var(--r-full);
+    font-family: 'Varela Round', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    transition: border-color var(--t-base) var(--ease-out),
+                background var(--t-base) var(--ease-out);
+}
+
+.field-input::placeholder {
+    color: var(--tx-5);
+    letter-spacing: 0.2px;
+}
+
+.field-input:focus {
+    outline: none;
+    border-color: var(--ac-2);
+    background: var(--bg-4);
+}
+
+/* Botón principal Sign In · pill · lavanda */
+.btn-signin {
+    width: 100%;
+    height: 52px;
+    margin-top: 4px;
+    padding: 0 24px;
     background: var(--ac-2);
     color: var(--ac-text);
     border: none;
@@ -159,52 +202,83 @@ body::-webkit-scrollbar { display: none; }
     cursor: pointer;
     transition:
         background var(--t-base) var(--ease-out),
-        transform var(--t-fast) var(--ease-out),
-        box-shadow var(--t-base) var(--ease-out);
-    box-shadow: 0 6px 24px rgba(198, 184, 255, 0.22);
+        transform var(--t-fast) var(--ease-out);
+}
+
+.btn-signin:hover {
+    background: var(--ac-1);
+}
+
+.btn-signin:active {
+    transform: scale(0.98);
+    background: var(--ac-3);
+}
+
+/* Texto de registro */
+.signup-text {
+    text-align: center;
+    font-size: 13px;
+    color: var(--tx-4);
+    margin: 2px 0 8px;
+    letter-spacing: 0.2px;
+}
+
+.signup-text a {
+    color: var(--ac-2);
+    text-decoration: none;
+    transition: color var(--t-fast) var(--ease-out);
+}
+
+.signup-text a:hover {
+    color: var(--ac-1);
+    text-decoration: underline;
+}
+
+/* Botón Google · pill · gris oscuro */
+.btn-google {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 48px;
+    padding: 0 20px;
+    background: var(--bg-4);
+    color: var(--tx-1);
+    border: 1px solid var(--ln-1);
+    border-radius: var(--r-full);
+    font-family: 'Varela Round', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition:
+        background var(--t-base) var(--ease-out),
+        border-color var(--t-base) var(--ease-out),
+        transform var(--t-fast) var(--ease-out);
 }
 
 .btn-google:hover {
-    background: var(--ac-1);
-    box-shadow: 0 8px 30px rgba(198, 184, 255, 0.32);
+    background: var(--bg-5);
+    border-color: var(--ln-2);
 }
 
 .btn-google:active {
-    transform: scale(0.97);
-    background: var(--ac-3);
+    transform: scale(0.98);
 }
 
 .btn-google svg {
     flex-shrink: 0;
 }
 
-/* Texto legal */
-.login-legal {
-    text-align: center;
-    font-size: 11px;
-    color: var(--tx-4);
-    line-height: 1.6;
-    margin: 8px 0 0;
-    letter-spacing: 0.2px;
-}
-
-.login-legal a {
-    color: var(--ac-2);
-    text-decoration: none;
-    transition: color var(--t-fast) var(--ease-out);
-}
-
-.login-legal a:hover {
-    color: var(--ac-1);
-    text-decoration: underline;
-}
-
 /* Ajuste en pantallas muy pequeñas */
 @media (max-width: 380px) {
-    .login-wordmark { font-size: 36px; }
-    .login-title { font-size: 22px; }
-    .btn-google { padding: 14px 20px; font-size: 14px; }
+    .login-wordmark { font-size: 30px; }
+    .login-title { font-size: 24px; }
+    .field-input,
+    .btn-signin { height: 48px; }
+    .btn-google { height: 44px; font-size: 12px; }
 }
+
 /* ============================================================
    DASHBOARD - TOPBAR
    ============================================================ */
