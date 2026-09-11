@@ -94,8 +94,13 @@ body::-webkit-scrollbar { display: none; }
 .hidden { display: none !important; }
 
 /* ============================================================
-   LOGIN VIEW · Wordmark + Bottom Sheet
+   LOGIN VIEW · Móvil: Bottom Sheet · Desktop: Card
    ============================================================ */
+
+/* Clases de visibilidad por dispositivo */
+.mobile-only  { display: block; }
+.desktop-only { display: none; }
+
 #loginView {
     min-height: 100vh;
     min-height: 100dvh;
@@ -109,7 +114,7 @@ body::-webkit-scrollbar { display: none; }
     overflow: hidden;
 }
 
-/* Wordmark "Calima" flotando sobre negro puro */
+/* ── Wordmark ── */
 .login-wordmark {
     font-family: 'Varela Round', sans-serif;
     font-size: 44px;
@@ -126,7 +131,7 @@ body::-webkit-scrollbar { display: none; }
     animation: id-fade-in 0.6s var(--ease-out);
 }
 
-/* Bottom sheet */
+/* ── Sheet (móvil) / Card (desktop) ── */
 .login-sheet {
     flex: 1;
     width: 100%;
@@ -140,7 +145,7 @@ body::-webkit-scrollbar { display: none; }
     animation: id-slide-up 0.55s var(--ease-out);
 }
 
-/* Formulario dentro del sheet */
+/* ── Formulario ── */
 .login-form {
     width: 100%;
     max-width: 360px;
@@ -150,7 +155,6 @@ body::-webkit-scrollbar { display: none; }
     gap: 18px;
 }
 
-/* Título Sign In · izquierda */
 .login-title {
     font-family: 'Varela Round', sans-serif;
     font-size: 28px;
@@ -161,7 +165,7 @@ body::-webkit-scrollbar { display: none; }
     margin: 0 0 12px;
 }
 
-/* Campos */
+/* ── Campos ── */
 .field {
     display: flex;
     flex-direction: column;
@@ -205,7 +209,7 @@ body::-webkit-scrollbar { display: none; }
     background: var(--bg-4);
 }
 
-/* Botón principal Sign In · pill · lavanda */
+/* ── Botón principal Sign In ── */
 .btn-signin {
     width: 100%;
     height: 52px;
@@ -224,16 +228,10 @@ body::-webkit-scrollbar { display: none; }
         transform var(--t-fast) var(--ease-out);
 }
 
-.btn-signin:hover {
-    background: var(--ac-1);
-}
+.btn-signin:hover  { background: var(--ac-1); }
+.btn-signin:active { transform: scale(0.98); background: var(--ac-3); }
 
-.btn-signin:active {
-    transform: scale(0.98);
-    background: var(--ac-3);
-}
-
-/* Texto de registro */
+/* ── Texto de registro ── */
 .signup-text {
     text-align: center;
     font-size: 13px;
@@ -253,7 +251,7 @@ body::-webkit-scrollbar { display: none; }
     text-decoration: underline;
 }
 
-/* Botón Google · pill · gris oscuro */
+/* ── Botón Google ── */
 .btn-google {
     display: inline-flex;
     align-items: center;
@@ -276,27 +274,58 @@ body::-webkit-scrollbar { display: none; }
         transform var(--t-fast) var(--ease-out);
 }
 
-.btn-google:hover {
-    background: var(--bg-5);
-    border-color: var(--ln-2);
-}
+.btn-google:hover  { background: var(--bg-5); border-color: var(--ln-2); }
+.btn-google:active { transform: scale(0.98); }
+.btn-google svg    { flex-shrink: 0; }
 
-.btn-google:active {
-    transform: scale(0.98);
-}
-
-.btn-google svg {
-    flex-shrink: 0;
-}
-
-/* Ajuste en pantallas muy pequeñas */
+/* ══════════════════════════════════════════════════════════
+   AJUSTE MÓVIL PEQUEÑO
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 380px) {
     .login-wordmark { font-size: 36px; margin: 32px 0 20px; }
-    .login-sheet { padding: 32px 20px 32px; }
-    .login-title { font-size: 24px; }
+    .login-sheet    { padding: 32px 20px 32px; }
+    .login-title    { font-size: 24px; }
     .field-input,
-    .btn-signin { height: 48px; }
-    .btn-google { height: 44px; font-size: 12px; }
+    .btn-signin     { height: 48px; }
+    .btn-google     { height: 44px; font-size: 12px; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   DESKTOP · Card centrada con Calima dentro
+   ══════════════════════════════════════════════════════════ */
+@media (min-width: 720px) {
+    /* Ocultar el wordmark externo y el "Sign In" */
+    .mobile-only  { display: none !important; }
+    .desktop-only { display: block; }
+
+    #loginView {
+        justify-content: center;
+        padding: 24px;
+        overflow: auto;
+    }
+
+    /* La "sheet" se convierte en card flotante */
+    .login-sheet {
+        flex: 0 1 auto;
+        width: 100%;
+        max-width: 420px;
+        background: var(--bg-2);
+        border: 1px solid var(--ln-1);
+        border-radius: var(--r-xl);
+        padding: 48px 40px 40px;
+        box-shadow: var(--sh-lg), var(--sh-glow);
+    }
+
+    /* El wordmark dentro de la card */
+    .login-sheet .login-wordmark {
+        font-size: 38px;
+        margin: 0 0 32px;
+    }
+
+    /* El formulario ocupa todo el ancho del card */
+    .login-form {
+        max-width: 100%;
+    }
 }
 
 /* ============================================================

@@ -15,13 +15,17 @@
 <body>
     <!-- LOGIN VIEW -->
     <div id="loginView" class="view">
-        <!-- Wordmark flotando sobre el negro -->
-        <h1 class="login-wordmark">Calima</h1>
+        <!-- Wordmark solo móvil (fuera del sheet) -->
+        <h1 class="login-wordmark mobile-only">Calima</h1>
 
-        <!-- Bottom sheet con el formulario -->
+        <!-- Sheet (móvil) / Card (desktop) -->
         <div class="login-sheet">
+            <!-- Wordmark solo desktop (dentro de la card) -->
+            <h1 class="login-wordmark desktop-only">Calima</h1>
+
             <div class="login-form">
-                <h2 class="login-title">Sign In</h2>
+                <!-- Título solo móvil -->
+                <h2 class="login-title mobile-only">Sign In</h2>
 
                 <div class="field">
                     <label for="emailInput" class="field-label">EMAIL</label>
